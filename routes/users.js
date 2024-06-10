@@ -1,12 +1,7 @@
 var express = require('express');
-var router = express.Router();
 var cors = require('cors');
-
-router.use(cors({
-  origin: 'https://novatweet-frontend.vercel.app',
-  methods: 'GET, POST, PUT, DELETE',
-  allowedHeaders: 'Content-Type, Authorization'
-}));
+var app = express();
+var router = express.Router();
 
 require('../models/connection');
 const User = require('../models/users');
@@ -14,6 +9,17 @@ const { checkBody } = require('../modules/checkBody');
 const bcrypt = require('bcrypt');
 const uid2 = require('uid2');
 
+// Apply CORS middleware
+app.use(cors({
+  origin: 'https://novatweet-frontend.vercel.app',
+  methods: 'GET, POST, PUT, DELETE',
+  allowedHeaders: 'Content-Type, Authorization'
+}));
+
+// Body parser middleware to handle JSON requests
+app.use(express.json());
+
+// Signup route
 router.post('/signup', (req, res) => {
   if (!checkBody(req.body, ['firstName', 'username', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
@@ -43,6 +49,7 @@ router.post('/signup', (req, res) => {
   });
 });
 
+// Signin route
 router.post('/signin', (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
@@ -50,7 +57,7 @@ router.post('/signin', (req, res) => {
   }
 
   User.findOne({ username: { $regex: new RegExp(req.body.username, 'i') } }).then(data => {
-    if (bcrypt.compareSync(req.body.password, data.password)) {
+    if (data && bcrypt.compareSync(req.body.password, data.password)) {
       res.json({ result: true, token: data.token, username: data.username, firstName: data.firstName });
     } else {
       res.json({ result: false, error: 'User not found or wrong password' });
@@ -58,4 +65,11 @@ router.post('/signin', (req, res) => {
   });
 });
 
-module.exports = router;
+// Use the router
+app.use('/users', router);
+
+// Start the server
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
