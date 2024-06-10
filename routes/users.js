@@ -1,5 +1,5 @@
 var express = require('express');
-var cors = require('cors');
+// var cors = require('cors');
 var app = express();
 var router = express.Router();
 
@@ -9,18 +9,18 @@ const { checkBody } = require('../modules/checkBody');
 const bcrypt = require('bcrypt');
 const uid2 = require('uid2');
 
-// Apply CORS middleware
-app.use(cors({
-  origin: 'https://novatweet-frontend.vercel.app',
-  methods: 'GET, POST, PUT, DELETE',
-  allowedHeaders: 'Content-Type, Authorization'
-}));
+// // Apply CORS middleware
+// app.use(cors({
+//   origin: "https://novatweet-frontend.vercel.app",
+//   methods: 'GET, POST, PUT, DELETE',
+//   allowedHeaders: 'Content-Type, Authorization'
+// }));
 
-// Body parser middleware to handle JSON requests
-app.use(express.json());
+// // Body parser middleware to handle JSON requests
+// app.use(express.json());
 
 // Signup route
-router.post('/signup', (req, res) => {
+router.post("/signup", (req, res) => {
   if (!checkBody(req.body, ['firstName', 'username', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
@@ -50,7 +50,7 @@ router.post('/signup', (req, res) => {
 });
 
 // Signin route
-router.post('/signin', (req, res) => {
+router.post("/signin", (req, res) => {
   if (!checkBody(req.body, ['username', 'password'])) {
     res.json({ result: false, error: 'Missing or empty fields' });
     return;
@@ -66,7 +66,7 @@ router.post('/signin', (req, res) => {
 });
 
 // Use the router
-app.use('/users', router);
+app.use("/users", router);
 
 // Start the server
 const port = process.env.PORT || 3000;
