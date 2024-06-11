@@ -1,13 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const cors = require('cors');
-
-router.use(cors({
-  origin: `https://simple-js-site-frontend.vercel.app`,
-  methods: 'GET, POST, PUT, DELETE',
-  allowedHeaders: 'Content-Type, Authorization'
-}));
-
 const User = require('../models/users');
 const Tweet = require('../models/tweets');
 const { checkBody } = require('../modules/checkBody');
@@ -43,7 +35,7 @@ router.get('/all/:token', (req, res) => {
       return;
     }
 
-    Tweet.find() // Populate and select specific fields to return (for security purposes)
+    Tweet.find()
       .populate('author', ['username', 'firstName'])
       .populate('likes', ['username'])
       .sort({ createdAt: 'desc' })
@@ -91,7 +83,7 @@ router.get('/hashtag/:token/:query', (req, res) => {
       return;
     }
 
-    Tweet.find({ content: { $regex: new RegExp('#' + req.params.query, 'i') } }) // Populate and select specific fields to return (for security purposes)
+    Tweet.find({ content: { $regex: new RegExp('#' + req.params.query, 'i') } }) 
       .populate('author', ['username', 'firstName'])
       .populate('likes', ['username'])
       .sort({ createdAt: 'desc' })
@@ -119,13 +111,13 @@ router.put('/like', (req, res) => {
         return;
       }
 
-      if (tweet.likes.includes(user._id)) { // User already liked the tweet
-        Tweet.updateOne({ _id: tweet._id }, { $pull: { likes: user._id } }) // Remove user ID from likes
+      if (tweet.likes.includes(user._id)) {
+        Tweet.updateOne({ _id: tweet._id }, { $pull: { likes: user._id } }) 
           .then(() => {
             res.json({ result: true });
           });
-      } else { // User has not liked the tweet
-        Tweet.updateOne({ _id: tweet._id }, { $push: { likes: user._id } }) // Add user ID to likes
+      } else {
+        Tweet.updateOne({ _id: tweet._id }, { $push: { likes: user._id } })
           .then(() => {
             res.json({ result: true });
           });
@@ -152,7 +144,7 @@ router.delete('/', (req, res) => {
         if (!tweet) {
           res.json({ result: false, error: 'Tweet not found' });
           return;
-        } else if (String(tweet.author._id) !== String(user._id)) { // ObjectId needs to be converted to string (JavaScript cannot compare two objects)
+        } else if (String(tweet.author._id) !== String(user._id)) { 
           res.json({ result: false, error: 'Tweet can only be deleted by its author' });
           return;
         }
